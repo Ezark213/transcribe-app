@@ -51,3 +51,7 @@ temp_chunks/
 TranscribeApp_Dist/
 *.txt
 !requirements.txt
+
+# ffmpeg バイナリ
+ffmpeg_bin/
+ffmpeg.zip

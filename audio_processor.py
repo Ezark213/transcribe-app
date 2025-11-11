@@ -4,12 +4,49 @@
 """
 
 import os
+import sys
 from datetime import timedelta
+
+
+def get_ffmpeg_path():
+    """実行環境に応じたffmpegのパスを取得"""
+    # PyInstallerでビルドされた場合
+    if getattr(sys, 'frozen', False):
+        # 実行ファイルと同じディレクトリ
+        bundle_dir = sys._MEIPASS
+        ffmpeg_path = os.path.join(bundle_dir, 'ffmpeg.exe')
+        if os.path.exists(ffmpeg_path):
+            return ffmpeg_path
+
+    # 開発環境の場合
+    ffmpeg_dir = os.path.join(os.path.dirname(__file__), "ffmpeg_bin")
+    ffmpeg_path = os.path.join(ffmpeg_dir, "ffmpeg.exe")
+    if os.path.exists(ffmpeg_path):
+        return ffmpeg_path
+
+    # システムのPATHから探す
+    return "ffmpeg"
+
+
+def setup_pydub_ffmpeg():
+    """pydubにffmpegのパスを設定"""
+    try:
+        from pydub import AudioSegment
+        ffmpeg_path = get_ffmpeg_path()
+        if ffmpeg_path != "ffmpeg":
+            AudioSegment.converter = ffmpeg_path
+            # ffprobeも同様に設定
+            ffprobe_path = ffmpeg_path.replace("ffmpeg.exe", "ffprobe.exe")
+            if os.path.exists(ffprobe_path):
+                AudioSegment.ffprobe = ffprobe_path
+    except ImportError:
+        pass
 
 
 def get_audio_duration(audio_file):
     """音声ファイルの長さを取得（秒）"""
     try:
+        setup_pydub_ffmpeg()  # ffmpegパスを設定
         from pydub import AudioSegment
         audio = AudioSegment.from_file(audio_file)
         return len(audio) / 1000  # ミリ秒を秒に変換
@@ -34,6 +71,7 @@ def split_audio_file(audio_file, chunk_length_minutes=30, progress_callback=None
         (chunks, temp_dir) のタプル、失敗時は (None, None)
     """
     try:
+        setup_pydub_ffmpeg()  # ffmpegパスを設定
         from pydub import AudioSegment
 
         if progress_callback:

@@ -24,6 +24,15 @@ def build_app():
         print("Run: pip install pyinstaller")
         return False
 
+    # ffmpegの確認とダウンロード
+    ffmpeg_dir = "ffmpeg_bin"
+    if not os.path.exists(ffmpeg_dir):
+        print("[INFO] ffmpeg not found, downloading...")
+        subprocess.run([sys.executable, "download_ffmpeg.py"])
+        if not os.path.exists(ffmpeg_dir):
+            print("[WARNING] ffmpeg download failed, building without ffmpeg")
+            print("[WARNING] Long audio processing may not work")
+
     # ビルドオプション
     app_name = "TranscribeApp"
     icon_path = "assets/transcribe_icon.ico"
@@ -43,8 +52,20 @@ def build_app():
         "--hidden-import", "pydub",
         "--collect-all", "flet",
         "--collect-all", "whisper",
-        "app.py"
     ]
+
+    # ffmpegを含める
+    if os.path.exists(ffmpeg_dir):
+        ffmpeg_exe = os.path.join(ffmpeg_dir, "ffmpeg.exe")
+        ffprobe_exe = os.path.join(ffmpeg_dir, "ffprobe.exe")
+        if os.path.exists(ffmpeg_exe):
+            command.extend(["--add-binary", f"{ffmpeg_exe};."])
+            print(f"[OK] Including ffmpeg.exe")
+        if os.path.exists(ffprobe_exe):
+            command.extend(["--add-binary", f"{ffprobe_exe};."])
+            print(f"[OK] Including ffprobe.exe")
+
+    command.append("app.py")
 
     print("Building application...")
     print(f"Command: {' '.join(command)}")

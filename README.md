@@ -9,6 +9,7 @@ OpenAI Whisperを使用した、モダンなUIの音声文字起こしアプリ�
 - ⏱️ **長時間録音対応**: 30分以上の音声を自動的にチャンク分割して処理
 - 💾 **自動保存**: デスクトップに結果を自動保存
 - 🔄 **リアルタイム進捗表示**: 処理状況をリアルタイムで表示
+- 📦 **完全パッケージ**: ffmpegを含む全依存関係を内包
 
 ## 対応フォーマット
 
@@ -27,9 +28,16 @@ OpenAI Whisperを使用した、モダンなUIの音声文字起こしアプリ�
 pip install -r requirements.txt
 ```
 
-### ffmpegのインストール
+### ffmpegについて
 
-長時間録音対応機能を使用する場合、ffmpegが必要です：
+**ビルド済みアプリ**: ffmpegは自動的に含まれます（ダウンロード不要）
+
+**開発環境**: ビルドスクリプトが自動的にダウンロードします
+```bash
+python download_ffmpeg.py
+```
+
+または手動インストール：
 - Windows: https://ffmpeg.org/download.html
 - Chocolatey: `choco install ffmpeg`
 
