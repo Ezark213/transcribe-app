@@ -1,0 +1,7 @@
+flet>=0.25.0
+openai-whisper
+pydub
+torch
+torchaudio
+pillow
+pyinstaller
